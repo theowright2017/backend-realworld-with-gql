@@ -2,6 +2,10 @@ import express from "express";
 import userRouter from "../routes/userRoute";
 import morgan from "morgan";
 import cors from "cors";
+import profileRouter from "../routes/profileRoute";
+import articleRouter from "../routes/articleRoute";
+import { validate } from "../middleware/validate";
+import commentRouter from "../routes/commentRoute";
 
 const app = express();
 
@@ -15,6 +19,9 @@ app.get("/", (req, res, next) => {
 	res.json({ message: "You Are Home" });
 });
 
-app.use("/api", userRouter)
+app.use("/api", validate, userRouter)
+app.use("/api", validate, profileRouter)
+app.use("/api", validate, articleRouter)
+app.use("/api", validate, commentRouter)
 
 export default app;

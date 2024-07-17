@@ -1,6 +1,11 @@
 import express from "express";
 import { body } from "express-validator";
-import { createNewUser, getCurrentUser, loginAsUser } from "../handlers/user";
+import {
+	createNewUser,
+	getCurrentUser,
+	loginAsUser,
+	updateCurrentUser,
+} from "../handlers/user";
 import { protect } from "../helpers/auth";
 
 const userRouter = express.Router();
@@ -20,12 +25,17 @@ userRouter.post(
 	loginAsUser
 );
 
-userRouter.get("/user",
-    protect,
-    getCurrentUser)
+userRouter.get("/user", protect, getCurrentUser);
 
-
-
-// router.put("/user", updateCurrentUser)
+userRouter.put(
+	"/user",
+	protect,
+	body("email").isString(),
+	body("username").isString(),
+	body("password").isString(),
+	body("image").isString(),
+	body("bio").isString(),
+	updateCurrentUser
+);
 
 export default userRouter;

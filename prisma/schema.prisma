@@ -8,51 +8,47 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  username String  @unique
+  id       String   @id @default(uuid())
+  username String   @unique
   password String
-  email    String  @unique
+  email    String   @unique
   bio      String?
   image    String?
   token    String?
+  articles Article?
+  comments Comment?
 }
 
-model Profile {
-  username  String         @unique
-  bio       String?
-  image     String?
-  following Boolean        @default(false)
-  articles  SingleArticle?
-  comments  SingleComment?
-}
-
-model SingleArticle {
-  id              String   @id @default(uuid())
+model Article {
+  id              String    @id @default(uuid())
   slug            String
   title           String
   description     String
   body            String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  favourited      Boolean  @default(false)
-  favouritesCount Int
-  authorName      String   @unique
-  author          Profile  @relation(fields: [authorName], references: [username])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  favourited      Boolean   @default(false)
+  favouritesCount Int       @default(0)
+  authorName      String    @unique
+  author          User      @relation(fields: [authorName], references: [username])
+  comments        Comment[]
   tagList         Tag[]
 }
 
-model SingleComment {
+model Comment {
   id         String   @id @default(uuid())
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   body       String
   authorName String   @unique
-  author     Profile  @relation(fields: [authorName], references: [username])
+  articleId  String
+  article    Article  @relation(fields: [articleId], references: [id])
+  author     User     @relation(fields: [authorName], references: [username])
 }
 
 model Tag {
-  id        String        @id @default(uuid())
-  tagName   String        @unique
+  id        String  @id @default(uuid())
+  tagName   String  @unique
   articleId String
-  article   SingleArticle @relation(fields: [articleId], references: [id])
+  article   Article @relation(fields: [articleId], references: [id])
 }
