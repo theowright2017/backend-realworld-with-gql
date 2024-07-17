@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  username String  @unique
+  password String
+  email    String  @unique
+  bio      String?
+  image    String?
+  token    String?
+}
+
+model Profile {
+  username  String         @unique
+  bio       String?
+  image     String?
+  following Boolean        @default(false)
+  articles  SingleArticle?
+  comments  SingleComment?
+}
+
+model SingleArticle {
+  id              String   @id @default(uuid())
+  slug            String
+  title           String
+  description     String
+  body            String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  favourited      Boolean  @default(false)
+  favouritesCount Int
+  authorName      String   @unique
+  author          Profile  @relation(fields: [authorName], references: [username])
+  tagList         Tag[]
+}
+
+model SingleComment {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  body       String
+  authorName String   @unique
+  author     Profile  @relation(fields: [authorName], references: [username])
+}
+
+model Tag {
+  id        String        @id @default(uuid())
+  tagName   String        @unique
+  articleId String
+  article   SingleArticle @relation(fields: [articleId], references: [id])
+}
