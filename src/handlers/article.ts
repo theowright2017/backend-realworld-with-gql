@@ -10,6 +10,7 @@ const createArticle = async (req, res, next) => {
 			description,
 			body,
 			authorName: req.user.username,
+			// tagList: req.body.tagList,
 		},
 	});
 
@@ -41,7 +42,7 @@ const updateArticle = async (req, res, next) => {
 			authorName: req.user.username,
 		},
 		data: {
-			...req.body,
+			...req.body
 		},
 	});
 
@@ -106,10 +107,38 @@ const listArticles = async (req, res, next) => {
 	res.status(200).json({ articles });
 };
 
+const favouriteArticle = async (req, res, next) => {
+	const article = await prisma.article.update({
+		where: {
+			slug: req.params.slug,
+		},
+		data: {
+			favourited: true,
+		},
+	});
+
+	res.status(200).json({ article });
+};
+
+const unfavouriteArticle = async (req, res, next) => {
+	const article = await prisma.article.update({
+		where: {
+			slug: req.params.slug,
+		},
+		data: {
+			favourited: false,
+		},
+	});
+
+	res.status(200).json({ article });
+};
+
 export {
 	createArticle,
 	getSingleArticle,
 	listArticles,
 	updateArticle,
 	deleteArticle,
+	favouriteArticle,
+	unfavouriteArticle,
 };

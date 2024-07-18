@@ -21,7 +21,7 @@ model User {
 
 model Article {
   id              String    @id @default(uuid())
-  slug            String
+  slug            String    @unique
   title           String
   description     String
   body            String
@@ -30,9 +30,9 @@ model Article {
   favourited      Boolean   @default(false)
   favouritesCount Int       @default(0)
   authorName      String    @unique
+  tagList         String[]
   author          User      @relation(fields: [authorName], references: [username])
   comments        Comment[]
-  tagList         Tag[]
 }
 
 model Comment {
@@ -44,11 +44,4 @@ model Comment {
   articleId  String
   article    Article  @relation(fields: [articleId], references: [id])
   author     User     @relation(fields: [authorName], references: [username])
-}
-
-model Tag {
-  id        String  @id @default(uuid())
-  tagName   String  @unique
-  articleId String
-  article   Article @relation(fields: [articleId], references: [id])
 }

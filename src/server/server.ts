@@ -6,6 +6,7 @@ import profileRouter from "../routes/profileRoute";
 import articleRouter from "../routes/articleRoute";
 import { validate } from "../middleware/validate";
 import commentRouter from "../routes/commentRoute";
+// import tagsRouter from "../routes/tagsRoute";
 
 const app = express();
 
@@ -23,5 +24,6 @@ app.use("/api", validate, userRouter)
 app.use("/api", validate, profileRouter)
 app.use("/api", validate, articleRouter)
 app.use("/api", validate, commentRouter)
+// app.use("/api", validate, tagsRouter)
 
 export default app;
