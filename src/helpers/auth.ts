@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import prisma from "../db";
 
 export const comparePasswords = (password, hashedPassword) => {
 	return bcrypt.compare(password, hashedPassword);
@@ -17,6 +18,43 @@ export const createJWT = (user) => {
 
 	return token;
 };
+
+export const createUser = async (input) => {
+	try {
+		const user = await prisma.user.create({
+			data: {
+				username: input.username,
+				password: await hashPassword(input.password),
+				email: input.email,
+			},
+		});
+
+		return user
+	} catch(err) {
+		throw new Error(err)
+	}
+}
+
+export const login = async (input) => {
+	const user = await prisma.user.findUnique({
+		where: {
+			email: input.email,
+		},
+	});
+
+	const matchesPassword = await comparePasswords(
+		input.password,
+		user.password
+	);
+
+	if (!matchesPassword) {
+		// handle error
+	}
+
+	user.token = await createJWT(user);
+
+	return user
+}
 
 export const protect = (req, res, next) => {
 	const bearer = req.headers.authorization;
