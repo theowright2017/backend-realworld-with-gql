@@ -8,14 +8,14 @@ datasource db {
 }
 
 model User {
-  id       String   @id @default(uuid())
-  username String   @unique
+  id       String    @id @default(uuid())
+  username String    @unique
   password String
-  email    String   @unique
+  email    String    @unique
   bio      String?
   image    String?
   token    String?
-  articles Article?
+  articles Article[]
   comments Comment?
 }
 
@@ -29,7 +29,7 @@ model Article {
   updatedAt       DateTime  @updatedAt
   favourited      Boolean   @default(false)
   favouritesCount Int       @default(0)
-  authorName      String    @unique
+  authorName      String
   tagList         String[]
   author          User      @relation(fields: [authorName], references: [username])
   comments        Comment[]

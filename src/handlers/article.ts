@@ -1,65 +1,39 @@
 import prisma from "../db";
+import {
+	createNewArticle,
+	deleteArticleDB,
+	getArticle,
+	listArticlesDB,
+	updateArticleDB,
+} from "../helpers/dbHelpers";
 
 const createArticle = async (req, res, next) => {
-	const { slug, title, description, body } = req.body;
-
-	const newArticle = await prisma.article.create({
-		data: {
-			slug,
-			title,
-			description,
-			body,
-			authorName: req.user.username,
-			// tagList: req.body.tagList,
-		},
-	});
-
-	if (!newArticle) {
-		// handle error
-	}
+	const newArticle = await createNewArticle(req.body, req.user);
 
 	res.status(200).json({ newArticle });
 };
 
 const getSingleArticle = async (req, res, next) => {
-	const article = await prisma.article.findFirst({
-		where: {
-			slug: req.params.slug,
-		},
-	});
-
-	if (!article) {
-		// handle error
-	}
+	const article = await getArticle(req.params.slug);
 
 	res.status(200).json({ article });
 };
 
 const updateArticle = async (req, res, next) => {
-	const updatedArticle = await prisma.article.update({
-		where: {
-			slug: req.params.slug,
-			authorName: req.user.username,
-		},
-		data: {
-			...req.body
-		},
-	});
-
-	if (!updateArticle) {
-		// handle error
-	}
+	const updatedArticle = await updateArticleDB(
+		req.body,
+		req.params.slug,
+		req.user.username
+	);
 
 	res.status(200).json({ updatedArticle });
 };
 
 const deleteArticle = async (req, res, next) => {
-	const deletedArticle = await prisma.article.delete({
-		where: {
-			slug: req.params.slug,
-			authorName: req.user.username,
-		},
-	});
+	const deletedArticle = await deleteArticleDB(
+		req.params.slug,
+		req.user.username
+	);
 
 	// handle error
 
@@ -67,42 +41,7 @@ const deleteArticle = async (req, res, next) => {
 };
 
 const listArticles = async (req, res, next) => {
-	const { tag, authorName, favourited, limit = 20, offset = 0 } = req.query;
-	console.log("QER--", req.query);
-	const filterConditions = [];
-
-	if (tag) {
-		filterConditions.push({
-			tagList: {
-				contains: tag,
-			},
-		});
-	} else if (authorName) {
-		filterConditions.push({
-			authorName: {
-				contains: authorName,
-			},
-		});
-	} else if (favourited) {
-		filterConditions.push({
-			favourited: {
-				contains: true, // !!!
-			},
-		});
-	}
-
-	const articles = await prisma.article.findMany({
-		where: {
-			AND: filterConditions,
-		},
-		orderBy: {
-			createdAt: "desc",
-		},
-	});
-
-	if (!articles) {
-		// handle error
-	}
+	const articles = await listArticlesDB(req.query);
 
 	res.status(200).json({ articles });
 };

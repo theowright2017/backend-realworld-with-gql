@@ -8,6 +8,7 @@ import {
 	ApolloServerPluginLandingPageProductionDefault,
 } from "@apollo/server/plugin/landingPage/default";
 import { startStandaloneServer } from "@apollo/server/standalone";
+import { getUserFromToken } from "../../helpers/graphqlAuth";
 
 console.log("GQL ROute---");
 
@@ -23,15 +24,26 @@ if (process.env.NODE_ENV === "production") {
 	plugins = [ApolloServerPluginLandingPageLocalDefault({ embed: true })];
 }
 
+// const server = new ApolloServer({
+// 	schema: addMocksToSchema({
+// 		schema: makeExecutableSchema({ typeDefs: schema, resolvers }),
+// 	}),
+// 	plugins
+// });
+
 const server = new ApolloServer({
-	schema: addMocksToSchema({
-		schema: makeExecutableSchema({ typeDefs: schema, resolvers }),
-	}),
-	plugins
+	typeDefs: schema,
+	resolvers,
+	plugins,
 });
 
 startStandaloneServer(server, {
+	context: async ({ req }) => {
+		const user = await getUserFromToken(req.headers["authorization"] ?? "");
+		return {
+			req,
+			user,
+		};
+	},
 	listen: { port: 4000 },
 });
-
-// console.log(`Server ready on: ${url} `)
