@@ -106,3 +106,52 @@ export const listArticlesDB = async (filters) => {
 		console.error(err);
 	}
 };
+
+export const addCommentToArticleDB = async (input, username) => {
+	try {
+		const comment = await prisma.comment.create({
+			data: {
+				body: input.body,
+				authorName: username,
+				articleId: input.articleId,
+			},
+		});
+
+		return comment;
+	} catch (err) {
+		console.error(err);
+	}
+};
+
+export const getCommentsFromArticleDB = async (slug, authorName) => {
+	try {
+		const { comments } = await prisma.article.findFirst({
+			where: {
+				slug: slug,
+				authorName: authorName,
+			},
+			include: {
+				comments: true,
+			},
+		});
+
+		return comments;
+	} catch (err) {
+		console.error(err);
+	}
+};
+
+export const deleteCommentFromArticleDB = async (input) => {
+	try {
+		const deletedComment = await prisma.comment.delete({
+			where: {
+				articleId: input.articleId,
+				id: input.commentId,
+			},
+		});
+
+		return deletedComment;
+	} catch (err) {
+		console.error(err);
+	}
+};

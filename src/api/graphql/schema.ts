@@ -19,6 +19,13 @@ const schema = `#graphql
         authorName: String!
     }
 
+    type Comment {
+        id: ID!
+        body: String!
+        authorName: String!
+        articleId: String!
+    }
+
     input UserInput {
         username: String!
     }
@@ -61,13 +68,23 @@ const schema = `#graphql
         favourited: Boolean
         limit: Int
         offset: Int
+    }
 
+    input AddCommentInput {
+        body: String!
+        articleId: String!
+    }
+
+    input DeleteCommentInput {
+        commentId: String!
+        articleId: String!
     }
 
     type Query {
         getCurrentUser: User!
         getArticle(input: GetArticleInput!): Article
         listAllArticles(filterConditions: ListArticlesFilterInput): [Article!]!
+        getCommentsFromArticle(slug: String!): [Comment]!
     }
 
     type Mutation {
@@ -76,6 +93,8 @@ const schema = `#graphql
         createNewArticle(input: CreateNewArticleInput!, user: UserInput!): Article!
         updateArticle(input: UpdateArticleInput!, existingSlug: String! ): Article!
         deleteArticle(input: DeleteArticleInput!): Article!
+        addCommentToArticle(input: AddCommentInput!, username: String!): Comment!
+        deleteCommentFromArticle(input: DeleteCommentInput!): Comment
     }
 
 `;
